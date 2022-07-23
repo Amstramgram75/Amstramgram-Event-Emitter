@@ -11,7 +11,8 @@
     "es6",
     "class",
     "event",
-    "emitter"
+    "emitter",
+    "EventEmitter"
   ],
   "repository": {
     "type": "git",
