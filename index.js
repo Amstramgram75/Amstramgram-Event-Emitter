@@ -29,8 +29,11 @@ export default class AmstramgramEventEmitter {
     })
   }
 
-  off(eventName, fn) {
-    this.#getEventListByName(eventName).delete(fn)
+  off(eventsNames, fn) {
+    const self = this
+    eventsNames.split(' ').forEach(eventName => {
+      self.#getEventListByName(eventName).delete(fn)
+    })
   }
 
   emit(eventName, ...args) {
