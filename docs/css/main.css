@@ -1,0 +1,68 @@
+html,
+body,
+div,
+ul,
+li,
+a {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+body {
+	line-height: normal;
+}
+
+ul {
+	list-style: none;
+}
+
+a:link {
+	color: #000;
+	text-decoration: none;
+}
+
+a:visited {
+	color: #000;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #000;
+	text-decoration: none;
+}
+
+a:active {
+	color: #000;
+	text-decoration: none;
+}
+
+body{
+  background-color: #fff;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+          flex-direction: column;
+}
+
+.hidden{
+  display: none;
+}
+
+a.link {
+	display: block;
+	width: 100px;
+	height: 100px;
+	background: gray;
+	color: white;
+}
+
+.footer{
+  height: 100vh;
+}
