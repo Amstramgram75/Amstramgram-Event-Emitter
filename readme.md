@@ -2,7 +2,7 @@
 
 Inspiration is taken from [https://gist.github.com/mudge/5830382#gistcomment-2691957](https://gist.github.com/mudge/5830382#gistcomment-2691957)
 
-[DEMO](https://amstramgram75.github.io/amstramgramEventEmitter/)
+[__DEMO__](https://amstramgram75.github.io/amstramgramEventEmitter/)
 
 # USAGE
 

@@ -8,32 +8,39 @@ export default class AmstramgramEventEmitter {
     return this.#events[eventName]
   }
 
+  constructor() {}
+
   on(eventsNames, fn) {
-    const self = this
     eventsNames.split(' ').forEach(eventName => {
-      if (!self.#getEventListByName(eventName).has(fn)) {
-        self.#getEventListByName(eventName).add(fn)
+      if (!this.#getEventListByName(eventName).has(fn)) {
+        this.#getEventListByName(eventName).add(fn)
       }
     })
     return this
   }
 
   once(eventsNames, fn) {
-    const self = this
     eventsNames.split(' ').forEach(eventName => {
       const onceFn = function (...args) {
-        self.off(eventName, onceFn)
-        fn.apply(self, args)
+        this.off(eventName, onceFn)
+        fn.apply(this, args)
       }
       this.on(eventName, onceFn)
     })
   }
 
-  off(eventsNames, fn) {
-    const self = this
-    eventsNames.split(' ').forEach(eventName => {
-      self.#getEventListByName(eventName).delete(fn)
-    })
+  off(eventsNames = '', fn = undefined) {
+    if (eventsNames == '') {
+      Object.keys(this.#events).forEach(event => this.#events[event].clear())
+    } else {
+      eventsNames.split(' ').forEach(eventName => {
+        if (fn == undefined) {
+          this.#getEventListByName(eventName).clear()
+        } else {
+          this.#getEventListByName(eventName).delete(fn)
+        }
+      })
+    }
   }
 
   emit(eventName, ...args) {
