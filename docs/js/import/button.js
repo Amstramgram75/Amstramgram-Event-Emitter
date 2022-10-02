@@ -1,165 +1,149 @@
-import Dot from './dot.js'
+import { default as EventEmitter } from './amstramgramEventEmitterLight-min.js'
+import SubButton from './subButton.js'
 
 
-export default class Button {
+export default class Button extends EventEmitter {
 	static #buttons = []
-	static emitter
 	static container
-	static callback
-	static reset(){
+	static reset() {
 		Button.#buttons.forEach(b => {
-			if (b.#active) b.#toggle()
+			b.active = false
+			b.#subButtons.forEach(sub => sub.active = false)
 		})
 	}
+	#subButtons = []
 	#active = false
-	#events
-	#name
-	#actions
-	#actionsOn
+	#disabled = false
+	#props
 	#buttonWrapper
+	#buttonContainer
 	#button
-	#buttonInner
 	#input
-	#callback = (event, e) => {
-		console.log(event.description, e)
-		Button.callback.call(this, event, e)
-	}
-	#callbackOnce = (event, e) => {
-		console.log(event.description, e)
-		Button.callback.call(this, event, e)
-		this.#actionsOn.delete(event.id)
-		if (this.#actionsOn.size == 0) {
-			this.#toggle()
-		} else if (this.#buttonWrapper.querySelector(`.subs>span.${event.id}`)) {
-			this.#buttonWrapper.querySelector(`.subs>span.${event.id}`).classList.remove('active')
-		}
-	}
 	#getLabel() {
-		let label = ``,
-			currentActions = this.#actions.filter(action => this.#actionsOn.has(action))
-		currentActions.forEach((action, id) => {
+		let label = this.#active ? `Unwatch mouse ` : `Watch mouse `,
+			eventsToList = this.#active ? this.#props.filter(prop => prop.on) : this.#props
+		eventsToList.forEach((ev, id) => {
 			if (id == 0) {
-				label = action
-			} else if (id < currentActions.length - 1) {
-				label += ', ' + action
+				label += ev.text
+			} else if (id < eventsToList.length - 1) {
+				label += ', ' + ev.text
 			} else {
-				label += (' and ' + action)
+				label += (' and ' + ev.text)
 			}
 		})
 		return label
 	}
-	#toggle() {
-		this.#active = !this.#active
-		this.#buttonWrapper.classList.toggle('active', this.#active)
-		this.#buttonWrapper.classList.remove('hide-input')
-		if (this.#active) {
-			if (this.#input) this.#input.disabled = true
-			if (this.#input && this.#input.checked) {
-				this.#input.disabled = true
-				this.#events.forEach(event => {
-					Button.emitter.once(event.name + this.#name, this.#callbackOnce)
-				})
-			} else {
-				this.#buttonWrapper.classList.add('hide-input')
-				this.#events.forEach(event => {
-					Button.emitter.on(event.name + this.#name, this.#callback)
-				})
-			}
-			this.#buttonInner.innerHTML = 'Unwatch mouse ' + this.#getLabel()
-			this.#buttonWrapper.querySelectorAll('.subs>span').forEach((b, id) => {
-				b.innerHTML = `Unwatch<br>${this.#actions[id]}`
-				b.classList.add('active')
-			})
-		} else {
-			if (this.#input) this.#input.disabled = false
-			const callback = (this.#input && this.#input.checked) ? this.#callbackOnce : this.#callback
-			this.#events.forEach(event => {
-				Button.emitter.off(event.name + this.#name, callback)
-			})
-			this.#actionsOn = new Set(this.#actions)
-			this.#buttonInner.innerHTML = 'Watch mouse ' + this.#getLabel()
-		}
-		const activeButtons = Button.#buttons.filter(b => b.#active)
-		Button.container.classList.toggle('show-unwatch-all', activeButtons.length > 1)
-	}
-	#toggleSub(button, event) {
-		const eventName = event.name,
-			action = event.id
-		if (this.#actionsOn.has(action)) {
-			this.#actionsOn.delete(action)
-			button.innerHTML = `Watch<br>${action}`
-			button.classList.remove('active')
-			Button.emitter.off(eventName + this.#name)
-		} else {
-			this.#actionsOn.add(action)
-			button.innerHTML = `Unwatch<br>${action}`
-			button.classList.add('active')
-			const callback = (this.#input && this.#input.checked) ? this.#callbackOnce : this.#callback
-			Button.emitter.on(eventName + this.#name, callback)
-		}
-		if (this.#actionsOn.size == 0) {
-			this.#toggle()
-		} else {
-			this.#buttonInner.innerHTML = 'Unwatch mouse ' + this.#getLabel()
-		}
-	}
-	constructor(events, name) {
+	constructor(props, id) {
+		super()
+		props.forEach(prop => {
+			prop.on = false
+			prop.once = false
+		})
 		Button.#buttons.push(this)
-		this.#events = events
-		this.#name = name
-		this.#actions = []
-		events.forEach(e => this.#actions.push(e.id))
-		this.#actionsOn = new Set(this.#actions)
+		this.#props = props
 		/**
-		 * <div class="button-wrapper multi mousedownupclick">//this.#buttonWrapper
-		 * 	<div class="button">//this.#button
-		 * 		<span>//this.#buttonInner
+		 * <div id="downUpClick" class="button-wrapper multi">//this.#buttonWrapper
+		 * 	<div class="button">//this.#buttonContainer
+		 * 		<span>//this.#button
 		 * 			Watch mouse down, up and click
 		 * 		</span>
-		 * 		<label for="mousedownupclick">ONCE</label>
-		 * 		<input type="checkbox" id="mousedownupclick" name="mousedownupclick">//this.#input
+		 * 		<label>
+		 * 			ONCE
+		 * 			<input type="checkbox">//this.#input
+		 * 		</label>
 		 * 	</div>
 		 * 	<div class="subs">
-		 * 		<span>
-		 * 			Unwatch<br>
-		 * 			down
-		 * 		</span>
-		 * 		<span>
-		 * 			Unwatch<br>
-		 * 			up
-		 * 		</span>
-		 * 		<span>
-		 * 			Unwatch<br>
-		 * 			click
-		 * 		</span>
+		 * 		<div id="down">
+		 * 			<span>
+		 * 				<span>Unwatch</span>
+		 *					<br>
+		 * 				down
+		 * 			</span>
+     *    	<input type="checkbox" id="input-down">
+     *    	<label for="input-down">ONCE</label>
+		 * 		</div>
+		 * 		<div id="up">
+		 * 			<span>
+		 * 				<span>Unwatch</span>
+		 *					<br>
+		 * 				up
+		 * 			</span>
+     *    	<input type="checkbox" id="input-up">
+     *    	<label for="input-up">ONCE</label>
+		 * 		</div>
+		 * 		<div id="click">
+		 * 			<span>
+		 * 				<span>Unwatch</span>
+		 *					<br>
+		 * 				click
+		 * 			</span>
+     *    	<input type="checkbox" id="input-click">
+     *    	<label for="input-click">ONCE</label>
+		 * 		</div>
 		 * 	</div>
 		 * </div>
 		 */
-		const buttonWrapperClass = this.#actions.length > 1 ? `button-wrapper multi ${name}` : `button-wrapper ${name}`
-		let str = `<div class="${buttonWrapperClass}"><div class="button"><span>Watch mouse ${this.#getLabel(this.#actions)}</span><label for="${name}">ONCE</label><input type="checkbox" id="${name}" name="${name}"></div>`
-		if (this.#actions.length > 1) {
-			str += `<div class="subs">`
-			this.#actions.forEach(action => {
-				str += `<span class="${action}">Unwatch<br>${action}</span>`
-			})
-			str += `</div>`
-		}
-		str += `</div>`
+		const
+			buttonWrapperClass = props.length > 1 ? `button-wrapper multi` : `button-wrapper`,
+			subsButtonContainer = props.length > 1 ? `<div class="subs"></div>` : ``
+		let str = `<div id="${id}" class="${buttonWrapperClass}"><div class="button"><span>${this.#getLabel()}</span><label>ONCE<input type="checkbox"></label></div>${subsButtonContainer}</div>`
 		Button.container.insertAdjacentHTML('beforeend', str)
-		this.#buttonWrapper = Button.container.querySelector(`.${name}`)
-		this.#button = this.#buttonWrapper.querySelector(`.button`)
-		this.#buttonInner = this.#buttonWrapper.querySelector(`.button>span`)
-		this.#input = this.#buttonWrapper.querySelector(`.button>input`)
-		this.#buttonInner.addEventListener('click', _ => this.#toggle())
-		this.#buttonWrapper.querySelectorAll('.subs>span').forEach((b, id) => {
-			b.addEventListener('click', _ => {
-				this.#toggleSub(b, this.#events[id])
-			})
+		this.#buttonWrapper = Button.container.querySelector(`#${id}`)
+		this.#buttonContainer = this.#buttonWrapper.querySelector(`.button`)
+		this.#button = this.#buttonContainer.querySelector(`span`)
+		this.#input = this.#buttonWrapper.querySelector(`.button input`)
+		this.#input.addEventListener('input', _ => {
+			props.forEach(prop => prop.once = this.#input.checked)
+			if (props.length > 1) {//If there are subButtons
+				this.#buttonWrapper.classList.toggle('once', this.#input.checked)
+			}
 		})
-		this.#events.forEach((event) => {
-			document.querySelector('canvas').addEventListener(event.name, e => {
-				Button.emitter.emit(event.name + name, event, e)
-			})
+		this.#button.addEventListener('click', _ => {
+			if (this.disabled) return false
+			this.active = !this.#active
+			this.#subButtons.forEach(b => b.active = this.#active)
+			this.emit('click', props)
 		})
+		if (props.length > 1) {//We need to build subButtons
+			for (let id = 0; id < props.length; id++) {
+				const subButton = new SubButton(props[id], this.#buttonWrapper.querySelector('.subs'))
+				this.#subButtons.push(subButton)
+				props[id].owner = subButton
+				subButton.on('click', _ => {
+					this.emit('subclick', props[id])
+				})
+				subButton.on('change', _ => {
+					this.disabled = (!this.active && this.#subButtons.filter(b => b.active || b.onceChecked).length > 0)
+					this.#button.innerHTML = this.#getLabel()
+					if (!this.disabled) this.#buttonWrapper.classList.toggle('hide-once', props.filter(prop => prop.on).length > 0)
+					if (!this.disabled && props.filter(prop => prop.on).length == 0) this.active = false
+				})
+			}
+		} else {
+			props[0].owner = this
+		}
+	}
+
+	set disabled(disabled) {
+		this.#disabled = disabled
+		this.#input.disabled = disabled
+		this.#buttonContainer.classList.toggle('disabled', disabled)
+		this.#buttonWrapper.classList.toggle('hide-once', disabled)
+	}
+
+	get disabled() {
+		return this.#disabled
+	}
+
+	set active(act) {
+		this.#active = act
+		this.#props.forEach(prop => prop.on = act)
+		this.#button.innerHTML = this.#getLabel()
+		this.#buttonWrapper.classList.toggle('active', act)
+		if(!this.disabled) this.#buttonWrapper.classList.toggle('hide-once', act)
+	}
+
+	get active(){
+		return this.#active
 	}
 }

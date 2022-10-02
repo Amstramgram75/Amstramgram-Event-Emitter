@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="fr" class="loading">
-<head>
+<head>	
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
@@ -97,6 +97,32 @@ class MyFabulousClass extends EventEmitter{
 	</div>
 	<div class="footer"></div>
   <link rel="stylesheet" href="css/main.css" media="print" onload="this.media='all';">
+	<script>
+		window.onerror = function(e) {
+			console.log('ERROR')
+		};
+	</script>
+	<script>
+		class TheTest{
+			#private
+			constructor(){
+				this.#private = ''
+			}
+		}
+		new TheTest()
+	</script>
   <script type="module" src="js/main.js"></script>
+	<script>
+		console.log('AFTERR')
+		const html = document.querySelector('html')
+		html.addEventListener('transitionend', function clean() {
+			html.classList.remove('loading')
+			html.classList.remove('loaded')
+			html.removeEventListener('transitionend', clean)
+		})
+		html.classList.add('loaded')
+
+	</script>
+
 </body>
 </html>
