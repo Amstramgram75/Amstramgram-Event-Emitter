@@ -32,6 +32,8 @@ const
   babelModule = {
     babelHelpers: 'bundled',
     plugins: [
+      // '@babel/plugin-proposal-class-properties',
+      // '@babel/plugin-proposal-private-methods',
       ['prismjs', {
         'languages': ['html', 'javascript', 'js-extras', 'json'],
       }]
