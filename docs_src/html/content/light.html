@@ -1,0 +1,106 @@
+<h2 id="installation">Installation</h2>
+<h3>npm</h3>
+<div class="code copy">
+  <pre><code class="language-shellsession">npm i -D rollup-plugin-posthtml-amstramgram</code></pre>
+</div>
+<p class="text">
+  Even better with all dependencies :<br>
+</p>
+<div class="code copy">
+  <pre><code class="language-shellsession">npm i -D rollup-plugin-posthtml-amstramgram posthtml fast-glob</code></pre>
+</div>
+<h3>Manually</h3>
+<p class="text">
+  Just <a href="https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/Amstramgram75/Amstramgram-Rollup-Plugins/blob/master/amstramgramRollupPluginPosthtml/index-module.js" target="_blank">download the plugin</a> in a <em>amstramgramRollupPluginPosthtml</em> folder located at the root of your project.<br>
+</p>
+<h3>Dependencies</h3>
+<div class="text">
+  <p>
+    If you haven't already, install <a href="https://github.com/posthtml/posthtml" target="_blank">posthtml</a>
+  </p>
+</div>
+<div class="code copy">
+  <pre><code class="language-shellsession">npm i -D posthtml</code></pre>
+</div>
+<p>
+  And <a href="https://github.com/mrmlnc/fast-glob" target="_blank">fast-glob</a>
+</p>
+<div class="code copy">
+  <pre><code class="language-shellsession">npm i -D fast-glob</code></pre>
+</div>
+<h2 id="usage">Usage</h2>
+<div class="code" data-filename="rollup.config.js">
+  <pre><code class="language-js">...
+//import rollup-plugin-posthtml-amstramgram from the folder where you downloaded it :
+import htmlPlugin from './amstramgramRollupPluginPosthtml/index-module'
+//Or if you have installed it from npm :
+//import htmlPlugin from 'rollup-plugin-posthtml-amstramgram'
+//import posthtml plugins you want to use :
+import htmlinclude from 'posthtml-include'
+import htmlnano from 'htmlnano'
+...
+
+export default = {
+  input: 'src/js/index.js',
+  output: {
+    file: 'dist/js/index.js',
+    format: ...
+  },
+  plugins: [
+    ...
+    htmlPlugin({
+      from: 'src/',
+      to: 'dist/',
+      plugins: [
+        htmlinclude({
+          root: 'src/html/'
+        }),
+        ...(process.env.BUILD === 'production' ? [htmlnano()] : [])
+      ]
+    }),
+    ...
+  ]
+}</code></pre>
+</div>
+<h2 id="options">Options</h2>
+<div class="options">
+  <h5>from</h5>
+  <div>
+    <p>
+      Either a <em>String</em> or an <em>Array</em> of <em>Strings</em>.
+    </p>
+    <p>
+      Each element should be a valid <em>glob</em>, or a string pointing to an existing file or directory.<br>
+      See <a href="https://github.com/mrmlnc/fast-glob" target="_blank">here</a> how to.
+    </p>
+    <p>
+      If a string points to an existing directory, it will be converted to a glob including all of its files.<br>
+      Eg : <em>docs_src/</em> becomes <em>docs_src/*.*</em><br>
+      However, only files with a <em>htm</em> or <em>html</em> extension will be processed.
+    </p>
+    <p>
+      Note also that all directories listed here will be watched if the <em>watch</em> option is set to <em>true</em> or not explicitly set to <em>false</em> while rollup is in watch mode&nbsp;: this way, <em>Rollup</em> will rebuild each time a new <em>html</em> file is created in those directories.
+    </p>
+  </div>
+  <h5>to</h5>
+  <div>
+    <p>
+      A <em>String</em> pointing to the destination directory.
+    </p>
+  </div>
+  <h5>plugins</h5>
+  <div>
+    <p>
+      An <em>Array</em> of <a href="https://posthtml.github.io/posthtml-plugins/" target="_blank">posthtml plugins</a>.
+    </p>
+  </div>
+  <h5>watch</h5>
+  <div>
+    <p>
+      A <em>Boolean</em> indicating whether the processed files and their dependencies should be watched.<br>
+      If omitted, it follows the <em>rollup watchMode</em>.
+    </p>
+  </div>
+</div>
+<p>
+</p>

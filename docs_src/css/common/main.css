@@ -1,0 +1,289 @@
+html,
+body,
+div,
+span,
+pre,
+code,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+a,
+img {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-family: inherit;
+  vertical-align: baseline;
+}
+
+html.smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--body-color);
+  font-family: Verdana, Geneva, sans-serif;
+  overflow-y: scroll;
+  transition: opacity 0.5s;
+  hyphens: auto;
+}
+
+html.loaded {
+  &:before,
+  &:after {
+    transition: opacity 0.5s;
+    opacity: 0;
+  }
+
+  & body {
+    opacity: 1;
+
+    & * {
+      transition: none !important;
+    }
+  }
+}
+
+ul {
+  list-style: none;
+}
+
+a,
+a:link,
+a:hover,
+a:visited,
+a:active {
+  color: var(--red);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+  font-weight: bold;
+}
+
+.bold{
+  font-weight: bold;
+}
+
+.orange {
+  color: var(--orange);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 100%;
+  width: 100%;
+  max-width: 1000px;
+  margin: auto;
+
+  & > :first-child {
+    padding-top: 140px;
+  }
+
+  & > :last-child {
+    min-height: calc(100vh - 300px);
+    margin-bottom: 150px;
+  }
+
+  & h2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.5em;
+    padding-top: 140px;
+  }
+
+  & h2:before,
+  & h2:after {
+    content: "";
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: middle;
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    background: var(--body-color);
+    margin-top: 0.2em;
+  }
+
+  & h2:before {
+    margin-right: 0.2em;
+  }
+
+  & h2:after {
+    margin-left: 0.2em;
+  }
+
+  & h3 {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-top: 2em;
+    color: var(--orange);
+  }
+
+
+  & p,
+  & ul {
+    font-size: 0.8rem;
+    text-align: justify;
+  }
+
+  & > p.text,
+  & div.text p {
+    line-height: 1.45;
+    margin-top: 1.2rem;
+
+    & a {
+      font-style: italic;
+    }
+  }
+
+  & .tree-structure{
+    margin-top: 1em;
+    padding: 1em;
+    background: #1e1e1e;
+    color: #c0cde0;
+    font-size: 0.8rem;
+    & ul {
+      margin-top: 0.5em;
+      margin-left: 1em;
+      margin-bottom: 0.5em;
+      padding-left: 0.5em;
+      border-left: 1px solid gray;
+    }
+  }
+
+  & .options {
+    & h5 {
+      font-weight: bold;
+      font-style: italic;
+      font-size: 0.85em;
+      color: var(--orange);
+      margin-top: 1em;
+      &:not(:first-of-type) {
+        margin-top: 2em;
+      }
+    }
+    & div {
+      margin-top: 0.5em;
+      border-left: 1px solid var(--orange);
+      padding: 0.2em 0 0.2em 0.5em;
+      & p:not(:first-of-type) {
+        margin-top: 0.5em;
+      }
+    }
+  }
+}
+
+.up {
+  right: 10px;
+  bottom: -50px;
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  background: var(--body-bg-color);
+  z-index: 100;
+  border: 3px solid var(--orange);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.4s, border-color 0.4s;
+
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+  }
+
+  &:before {
+    width: 12px;
+    height: 18px;
+    background: var(--orange);
+    left: 14px;
+    bottom: 6px;
+    transition: background-color 0.4s;
+  }
+
+  &:after {
+    left: 6px;
+    top: 4px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 14px 14px 14px;
+    border-color: transparent transparent var(--orange) transparent;
+    transition: border-color 0.4s;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      border: 3px solid var(--red);
+
+      &:before {
+        background: var(--red);
+      }
+
+      &:after {
+        border-color: transparent transparent var(--red) transparent;
+      }
+    }
+  }
+
+  &.show {
+    transform: translateY(-125%);
+  }
+}
+
+@media screen and (max-width: 1240px) {
+  body:not(.menu-is-closed) {
+    & .content {
+      & p,
+      & h3,
+      & h4 {
+        width: 95%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      & h2 {
+        padding-left: 0.5em;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1020px) {
+  .content {
+    & p,
+    & h3,
+    & h4 {
+      width: 95%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    & h2 {
+      padding-left: 0.5em;
+    }
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .content-wrapper {
+    margin-left: 220px;
+    transition: margin 0.4s;
+  }
+}

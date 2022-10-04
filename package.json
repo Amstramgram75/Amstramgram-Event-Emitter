@@ -1,23 +1,51 @@
 {
   "name": "amstramgram-event-emitter",
   "version": "1.0.0",
-  "description": "A very simple EventEmitter in pure JavaScript with ES6 class implementation",
-  "author": {
-    "name": "Amstramgram",
-    "email": "contact@onfaitdessites.fr",
-    "url": "https://onfaitdessites.fr/"
-  },
-  "keywords": [
-    "es6",
-    "class",
-    "event",
-    "emitter",
-    "EventEmitter"
-  ],
+  "description": "CSS, HTML and WATCHER plugins for Rollup.js. A technique to design a website with rollup.js",
+  "author": "Amstramgram <contact@onfaitdessites.fr>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Amstramgram75/Amstramgram-Event-Emitter"
+    "url": "git+https://github.com/Amstramgram75/Amstramgram-Rollup-Plugins.git"
   },
-  "main": "index.js",
-  "license": "MIT"
+  "bugs": {
+    "url": "https://github.com/Amstramgram75/Amstramgram-Rollup-Plugins/issues"
+  },
+  "homepage": "https://github.com/Amstramgram75/Amstramgram-Rollup-Plugins#readme",
+  "license": "MIT",
+  "scripts": {
+    "dev": "rollup -c -w --environment BUILD:development",
+    "prod": "rollup -c --environment BUILD:production"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.19.0",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-node-resolve": "^14.1.0",
+    "babel-plugin-prismjs": "^2.1.0",
+    "core-js": "^3.25.1",
+    "cssnano": "^5.1.13",
+    "fast-glob": "^3.2.11",
+    "fs-extra": "^10.1.0",
+    "htmlnano": "^2.0.2",
+    "postcss": "^8.4.16",
+    "postcss-import": "^15.0.0",
+    "postcss-preset-env": "^7.8.0",
+    "posthtml": "^0.16.6",
+    "posthtml-include": "^1.7.4",
+    "prismjs": "^1.29.0",
+    "rollup": "^2.79.1",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-livereload": "^2.0.5",
+    "rollup-plugin-postcss-amstramgram": "^1.0.1",
+    "rollup-plugin-posthtml-amstramgram": "^1.0.1",
+    "rollup-plugin-serve": "^2.0.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-watcher-amstramgram": "^1.0.1",
+    "terser": "^5.15.0"
+  },
+  "browserslist": [
+    "defaults",
+    "ie 11",
+    "Safari >= 9"
+  ]
 }

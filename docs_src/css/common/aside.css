@@ -1,0 +1,202 @@
+aside {
+  position: fixed;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  font-size: 1.1em;
+  background-color: var(--body-bg-color);
+  width: 220px;
+  height: 100%;
+  z-index: 101;
+  font-weight: bold;
+  transition: transform 0.4s;
+  border-right: 1px solid;
+  & .aside {
+    padding: 60px 20px 20px;
+    box-sizing: border-box;
+    height: 100%;
+    overflow: auto;
+    scroll-behavior: smooth;
+    scrollbar-color: var(--red) var(--orange);
+    scrollbar-width: thin;
+    &::-webkit-scrollbar {
+      width: 2px;
+      height: 2px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--orange);
+    }
+    &::-webkit-scrollbar-track {
+      background: var(--red);
+    }
+  }
+  & li {
+    padding-bottom: 0.5em;
+  }
+  & .menu{
+    margin-bottom: 10px;
+    & li a {
+      position: relative;
+      display: inline-flex;
+      flex-direction: row;
+      &.selected {
+        cursor: default;
+        pointer-events: none;
+        color: var(--orange);
+        &:before {
+          content: "";
+          height : 0;
+          width : 0;
+          border-top : 6px solid transparent;
+          border-bottom : 6px solid transparent;
+          border-left : 10px solid var(--orange);
+          margin: auto 5px auto 0;
+        }
+        &:after {
+          transform: scaleX(1);
+        }
+      }
+      &:not(.selected):after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -3px;
+        width: 100%;
+        height: 2px;
+        background: var(--red);
+        transform: scaleX(0);
+        transform-origin: 0 0;
+        transition: transform 0.2s;
+      }
+      @media (hover: hover) {
+        &:not(.selected):hover:after {
+          transform: scaleX(1);
+        }
+      }
+      @nest body.ie &:not(.selected):hover:after{
+        transform: scaleX(1);
+      }
+    }
+  }
+  & .sub-menu{
+    border-top: 1px solid var(--red);
+    padding-top: 30px;
+    font-size: 0.9em;
+    & li:before{
+      content: '\a0';
+      font-size: 0;
+      display: inline-block;
+      background: var(--orange);
+      margin-right: 0;
+      transform: scaleX(0.5);
+      transition: all 0.2s;
+    }
+    & li.active:before{
+      font-size: inherit;
+      margin-right: 0.2em;
+    }
+    & a{
+      color: var(--body-color);
+    }
+    & li:not(.active) a{
+      position: relative;
+      &:before{
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 100%;
+        height: 2px;
+        background: var(--body-color);
+        transform-origin: 0 50%;
+        transform: scale(0);
+        transition: transform 0.2s;
+      }
+      @media (hover: hover) {
+        &:hover:before {
+          transform: scaleX(1);
+        }
+      }
+      body.ie &:hover:before{
+        transform: scaleX(1);
+      }    
+    }
+  }
+}
+.menu-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  background: var(--body-bg-color);
+  cursor: pointer;
+  width: 100%;
+  height: 50px;
+  transition: transform 0.3s;
+  & span{
+    position:absolute;
+    right: 5px;
+    top: 5px;
+    display: flex;
+    width: 40px;
+    height: 40px;
+    &:before,
+    &:after {
+      content: "";
+      width: 100%;
+      height: 7px;
+      background: var(--orange);
+      border-radius: 5px;
+    }
+    &:before {
+      margin: auto;
+      box-shadow: none;
+      transform: rotate(45deg);
+      transition: transform 0.15s 0.15s, box-shadow 0.15s;
+    }
+    &:after {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      background: var(--orange);
+      transform: translate(-50%, -50%) rotate(-45deg);
+      transition: transform 0.15s;
+    }
+  }
+}
+#menu-btn {
+  display: none;
+}
+
+#menu-btn:checked {
+  & ~ aside {
+    transform: translateX(-100%);
+    overflow: visible;
+    & .menu-icon {
+      transform: translate(55px, 25px);
+      & span{
+        &:before {
+          box-shadow: 0 -16px 0 0 var(--orange), 0 16px 0 0 var(--orange);
+          transform: rotate(0deg);
+          transition: transform 0.15s, box-shadow 0.15s 0.15s;
+        }
+        &:after {
+          transform: translate(-50%, -50%);
+        }
+      }
+    }
+  }
+  & ~ .content-wrapper {
+    margin-left: 0;
+  }
+}
+@media screen and (min-width: 750px) {
+  #menu-btn:checked ~ aside .menu-icon {
+    transform: translate(55px, 15px);
+  }
+}
+@media screen and (max-width: 600px) {
+  aside{
+    width: 100%;
+  }
+}

@@ -1,0 +1,470 @@
+<h2 id="why">Why ?</h2>
+<div class="text">
+  <p>
+    <a href="https://rollupjs.org/" target="_blank">Rollup.js</a> is great and already has a lot of available <a
+      href="https://github.com/rollup/awesome" target="_blank">plugins</a>.<br>
+  </p>
+  <p>
+    <b>BUT...</b>
+  </p>
+  <p>
+    But those plugins require that you import all your stuff inside your javascript.<br>
+    There is no easy way to process external html or css files.<br>
+    So how to do when you simply want to build a website and serve optimized assets in your pages ?<br>
+    What if you want to write your javascript in ES2022 and provide an alternative version bundled with <a
+      href="https://babeljs.io/" target="_blank">Babel</a> to old browsers ?<br>
+    Or use latest CSS specifications and compile your stylesheets with <a
+      href="https://github.com/csstools/postcss-preset-env" target="_blank">PostCSS Preset Env</a> ?<br>
+  </p>
+  <p>
+    That was the problem I'm facing and the only solution I found to solve it was to build my own plugins collection...<br>
+    At least one to process HTML files and a second to compile the CSS...<br>
+    As I still had a little time to spare, I also build a small utility plugin to watch everything I need.
+  </p>
+  <p>
+    I will take advantage of this article to detail as precisely as possible the configuration that I use.</p>
+</div>
+<h2 id="goal">Goal</h2>
+<p class="text">
+  Usually, when I work on a multipage website, my project tree structure looks something like this :
+</p>
+<div class="tree-structure">
+  <span class="bold orange">root</span>
+  <ul>
+    <li><span class="bold orange">dev</span></li>
+    <li><span class="bold orange">prod</span></li>
+    <li><span class="bold orange">src</span></li>
+    <li>package.json</li>
+    <li>rollup.config.js</li>
+  </ul>
+</div>
+<p class="text">
+  This is the structure I used for this repo, except that :<br>
+  - <em>src</em> folder has been renamed to <em>docs_src</em>,<br>
+  - <em>dev</em> to <em>docs_dev</em><br>
+  - and <em>prod</em> to <em>docs</em> to ensure Github compatibility.<br>
+</p>
+<p class="text">
+  It also has three additional <em>amstramgramRollupPlugin</em> folders containing my own plugins.
+</p>
+<p class="text">
+  So, to be clear, here's how our working structure actually is :
+</p>
+<div class="tree-structure">
+  <span class="bold orange">root</span>
+  <ul>
+    <li><span class="bold orange">amstramgramRollupPluginPostcss</span></li>
+    <li><span class="bold orange">amstramgramRollupPluginPosthtml</span></li>
+    <li><span class="bold orange">amstramgramRollupPluginWatcher</span></li>
+    <li><span class="bold orange">docs</span></li>
+    <li><span class="bold orange">docs_dev</span></li>
+    <li><span class="bold orange">docs_src</span></li>
+    <li><span class="bold orange">node_modules</span></li>
+    <li>package.json</li>
+    <li>rollup.config.js</li>
+  </ul>
+</div>
+<p class="text">
+  Let's take a look at the <em>docs_src</em> folder :
+</p>
+<div class="tree-structure">
+  <span class="bold orange">docs_src</span>
+  <ul>
+    <li><span class="bold orange">css</span>
+      <ul>
+        <li><span class="bold orange">common</span>
+          <ul>
+            <li>aside.css</li>
+            <li>code.css</li>
+            <li>const.css</li>
+            <li>header.css</li>
+            <li>main.css</li>
+            <li>prism-vsc-dark-plus.css</li>
+          </ul>
+        </li>
+        <li>main.css</li>
+      </ul>
+    </li>
+    <li><span class="bold orange">html</span>
+      <ul>
+        <li><span class="bold orange">common</span>
+          <ul>
+            <li>head.html</li>
+            <li>header-aside.html</li>
+          </ul>
+        </li>
+        <li><span class="bold orange">content</span>
+          <ul>
+            <li>css.html</li>
+            <li>html.html</li>
+            <li>index.html</li>
+            <li>watcher.html</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><span class="bold orange">js</span>
+      <ul>
+        <li><span class="bold orange">common</span>
+          <ul>
+            <li>aside.js</li>
+            <li>code.js</li>
+            <li>main.js</li>
+          </ul>
+        </li>
+        <li><span class="bold orange">polyfill</span>
+          <ul>
+            <li>polyfill.js</li>
+          </ul>
+        </li>
+        <li>index.js</li>
+      </ul>
+    </li>
+    <li>css.html</li>
+    <li>error.html</li>
+    <li>html.html</li>
+    <li>index.html</li>
+    <li>watcher.html</li>
+  </ul>
+</div>
+<h3>CSS</h3>
+<p class="text">
+  The <em>css/common</em> subfolder contains all the style that should be imported in the <em>main.css</em> file.<br>
+  What we should be able to do is, from the <em>main.css</em> file and all its imported elements, build one file processed with <a
+  href="https://github.com/postcss/postcss-import" target="_blank">postcss-import</a> and <a
+  href="https://github.com/csstools/postcss-preset-env" target="_blank">PostCSS Preset Env</a> (and <a
+  href="https://cssnano.co/" target="_blank">cssnano</a> if needed) and put it in the right place in <em>docs_dev</em> (or <em>docs</em>) folder.<br>
+</p>
+<p class="text">
+  That's a job for <a href="css.html">rollup-plugin-postcss-amstramgram</a> !
+</p>
+<p class="text">
+  Finally, the result will be included at the bottom of the body of each html page and loaded asynchronously thanks to <a href="https://www.filamentgroup.com/lab/load-css-simpler/" target="_blank">a well-known solution</a>.
+</p>
+<div class="code">
+<pre><code class="language-html">&lt;link rel="stylesheet" href="css/main.css" media="print" onload="this.media='all';"&gt;</code></pre>
+</div>
+</p>
+<h3>HTML</h3>
+<p class="text">
+  The <em>html/common</em> subfolder contains the fragments of html code that are included in all the pages.<br>
+  In fact, all the pages of this wiki share the same meta in head, the same inline css, as well as the same <em>header</em> and <em>aside</em>.<br>
+  All those elements are included in each page with <em>posthtml-include</em>...<br>
+</p> 
+<p class="text">
+  The <em>html/content</em> subfolder holds the html code for the specific content of each page.<br>
+  Indeed, the four pages located at the root of the src folder are identical except for their title and description AND the fact that they each include a different content (and fortunately !!!)&nbsp;:<br>
+  - <em>index.html</em> includes <em>html/content/index.html</em>,<br>
+  - <em>html-plugin.html</em> includes <em>html/content/html-plugin.html</em>,<br>
+  etc.
+</p> 
+<p class="text">
+  What our plugin should do is to process the four html files located in the root of the <em>docs_src</em> folder with <a href="https://github.com/posthtml/posthtml-include" target="_blank">posthtml-include</a> (and <a href="https://github.com/posthtml/htmlnano" target="_blank">htmlnano</a> if we are building production files) and put the resulting files in <em>docs_dev</em> (or <em>docs</em>) folder.
+</p> 
+<p class="text">
+  This is the mission that <a href="html.html">rollup-plugin-posthtml-amstramgram</a> bravely accomplishes .
+</p> 
+<h3>JS</h3>
+<p class="text">
+  The main javascript file is included at the bottom of the body in script tags and minified for the production version.<br>
+  The modern version is served as a module. If it uses some recent features as classes or private methods, it should be
+  bundled by <em>Babel</em>.<br>
+  The old fashioned one is marked with a <em>nomodule</em> attribute and bundled with <em>Babel</em> according to the
+  browserslist specified in the <em>package.json</em> file.
+</p>
+<div class="code">
+<pre><code class="language-html">&lt;script type="module" src="./js/main.js"&gt;&lt;/script&gt;
+&lt;script nomodule src="./js/nomodule/main.js"&gt;&lt;/script&gt;</code></pre>
+</div>
+<h3>Assets</h3>
+<p class="text">
+  All the assets (images, icons, etc) are stored in an <em>assets</em> folder located at the root of the <em>docs_dev</em> directory.<br>
+  When in development mode, it would be nice if we could trigger a rollup rebuild each time one of its elements changes.<br>
+  That's exactly what the <a href="watcher.html">rollup-plugin-watcher-amstramgram</a> is made for !<br>
+  When building for production, we'll take advantage of <a href="https://github.com/vladshcherbin/rollup-plugin-copy" target="_blank">rollup-plugin-copy</a> to mirror it in the <em>docs</em> folder.
+</p>
+<h2 id="rollup">Rollup</h2>
+<div class="text">
+  <p>
+    <em>Rollup</em> has to bundle two files from our javascript stuff :<br>
+    - the first one is in <em>esm</em> format and will be load as a module by the html page;<br>
+    - the second one is in <em>iife</em> format and will be load as a traditional script if the browser does not support modules.<br>
+  </p>
+  <p>
+    However, if we want to support Internet Explorer 11, we might need some extra polyfill. This is the case here since we use <a href="https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent" target="_blank">Custom Events</a> that are not understood by IE11.<br>
+  </p>
+  <p>
+    That's why our rollup config file exports an array of three objects : <em>moduleExport</em>, <em>noModuleExport</em> and <em>polyfillExport</em>.<br>
+  </p>
+  <p>
+    <em>moduleExport</em> and <em>noModuleExport</em> have the same input but a different output format and a specific babel configuration.<br>
+    <em>polyfillExport</em> simply compile (and minify if in production mode) our polyfill file(s) from the <em>docs_src/js/polyfills</em> to the <em>docs_dev/js/polyfills</em> (or <em>docs/js/polyfills</em>) folder.
+  </p>
+  <p>
+    The <em>babelModule</em> object defines the babel configuration for the module build whereas the <em>babelNoModule</em> object extends <em>babelModule</em> with <a href="https://babeljs.io/docs/en/babel-preset-env" target="_blank">@babel/preset-env</a> and is used for the non module build.
+  </p>
+  <p>
+    Since the purpose of this project is also to distribute my plugins, Rollup will have an additional task when in production mode : bundle a <em>cjs</em> version of the original <em>es6</em> file.
+  </p>
+  <p>
+    All the <em>css</em> and <em>html</em> compilations and also the <em>server</em> or <em>copy</em> plugins are set in the module build.<br>
+  </p>
+  <p>
+    The <em>browserslist</em> entry of <em>package.json</em> is used by <em>@babel/preset-env</em> and <em>postcss-preset-env</em>.
+  </p>
+</div>
+<div class="code copy" data-filename="rollup.config.js">
+<pre><code class="language-js">//noderesolve and commonjs are needed for prism.js
+import noderesolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+//Server and live reload
+import serve from 'rollup-plugin-serve'
+import livereload from 'rollup-plugin-livereload'
+//JS
+import babel from '@rollup/plugin-babel'
+import { terser } from 'rollup-plugin-terser'
+//CSS
+//Here we use the es6 version of the plugin
+import cssPlugin from './amstramgramRollupPluginPostcss/index-module'
+//If the plugin has been installed with npm :
+//import cssPlugin from 'rollup-plugin-postcss-amstramgram'
+import postcssImport from 'postcss-import'
+import postcssPresetEnv from 'postcss-preset-env'
+import cssnano from 'cssnano'
+//HTML
+//Here we use the es6 version of the plugin
+import htmlPlugin from './amstramgramRollupPluginPosthtml/index-module'
+//If the plugin has been installed with npm :
+//import htmlPlugin from 'rollup-plugin-posthtml-amstramgram'
+import htmlinclude from 'posthtml-include'
+import htmlnano from 'htmlnano'
+//Assets
+//Watch changes in assets and plugins folders
+//Here we use the es6 version of the watcher plugin
+import watcher from './amstramgramRollupPluginWatcher/index-module'
+//If the plugin has been installed with npm :
+//import watcher from 'rollup-plugin-watcher-amstramgram'
+import fsExtra from 'fs-extra'//To empty prod folder when building for production
+import copy from 'rollup-plugin-copy'//Copy assets folder from dev to prod folder
+
+
+const
+  src = 'docs_src/',
+  dev = 'docs_dev/',
+  prod = 'docs/',
+  dest = process.env.BUILD === 'development' ? dev : prod,
+  pluginsFolders = ['Postcss', 'Posthtml', 'Watcher'].map(name => `amstramgramRollupPlugin${name}`),
+  //Babel basic configuration
+  babelModule = {
+    babelHelpers: 'bundled',
+    plugins: [
+      ['prismjs', {
+        'languages': ['html', 'javascript', 'js-extras', 'json'],
+      }]
+      //Adjust according to your needs...
+      //For example, if you're using class properties and private methods
+      //you should uncomment the next two lines
+      //'@babel/plugin-proposal-class-properties',
+      //'@babel/plugin-proposal-private-methods',
+    ]
+  },
+  //Babel configuration to support old browsers
+  babelNoModule = Object.assign({
+    exclude: [/\/core-js\//],
+    presets: [
+      [
+        '@babel/preset-env',
+        {
+          'useBuiltIns': 'usage',
+          'corejs': '3.8'
+        }
+      ]
+    ],
+  }, babelModule)
+
+//Clean production directory before production build
+if (process.env.BUILD === 'production') fsExtra.emptyDirSync(prod)
+
+//FIRST ROLLUP TASK :
+//- bundle js in a module
+//- watch assets and rollupPlugins folders
+//- compile css with minification if in production
+//- compile html with minification if in production
+//- launch server with livereload if in development
+//- copy assets and minify js if in production
+const moduleExport = {
+  input: `${src}js/index.js`,
+  output: {
+    file: `${dest}js/index.js`,
+    format: 'esm',
+    sourcemap: process.env.BUILD === 'development',
+  },
+  plugins: [
+    //noderesolve and commonjs are needed for prism.js
+    noderesolve(),
+    commonjs(),
+    cssPlugin({
+      from: `${src}css/`,
+      to: `${dest}css`,
+      sourceMap: process.env.BUILD === 'development',
+      plugins: [
+        postcssImport(),
+        postcssPresetEnv({
+          stage: 1,
+          importFrom: [
+            `${src}css/common/const.css`//Needed for css custom properties
+          ]
+        }),
+        ...(process.env.BUILD === 'production' ? [cssnano()] : [])
+      ]
+    }),
+    htmlPlugin({
+      from: src,
+      to: dest,
+      plugins: [
+        htmlinclude({
+          root: `${src}html/`
+        }),
+        ...(process.env.BUILD === 'production' ? [htmlnano()] : [])
+      ]
+    }),
+    ...(Object.keys(babelModule).length > 0 ? [babel(babelModule)] : []),
+    ...(process.env.BUILD === 'development' ?
+      [//Server and livereload for development
+        serve({
+          open: true,
+          contentBase: dev,
+          port: 8000
+        }),
+        livereload(),
+        watcher({
+          files: [`${dev}assets`, ...pluginsFolders],
+          verbose: true
+        }),
+      ]
+      :
+      [//Copy assets folder
+        copy({
+          targets: [
+            { src: `${dev}assets`, dest: prod }
+          ]
+        }),
+        //and minify
+        terser()
+      ]
+    )
+  ],
+  //Comment/Uncomment if you need
+  watch: {
+    clearScreen: process.env.BUILD === 'production',
+  },
+}
+
+//SECOND ROLLUP TASK : bundle js in IIFE format
+const noModuleExport = {
+  input: `${src}js/index.js`,
+  output: {
+    file: `${dest}js/noModule/index.js`,
+    format: 'iife'
+  },
+  plugins: [
+    //noderesolve and commonjs are needed for prism.js
+    noderesolve(),
+    commonjs(),
+    babel(babelNoModule),
+    ...(process.env.BUILD === 'production' ? [terser()] : [])
+  ]
+}
+
+//THIRD ROLLUP TASK : bundle polyfills
+const polyfillExport = {
+  input: `${src}js/polyfills/polyfill.js`,
+  output: {
+    file: `${dest}js/polyfills/polyfill.js`,
+    format: 'iife'
+  },
+  plugins: [
+    ...(process.env.BUILD === 'production' ? [terser()] : [])
+  ]
+}
+
+//FOURTH ROLLUP TASK : bundle common js versions for plugins
+const pluginsExport = []
+pluginsFolders.forEach(folder => {
+  pluginsExport.push({
+    input: `${folder}/index-module.js`,
+    external: ['fs', 'path', 'fast-glob', 'postcss', 'posthtml'],
+    output: {
+      file: `${folder}/index-common.js`,
+      exports: "auto",
+      format: 'cjs',
+    },
+  })
+})
+
+//Export rollup tasks
+export default [moduleExport, noModuleExport, polyfillExport, ...(process.env.BUILD === 'production' ? pluginsExport : [])]</code></pre>
+</div>
+<h2 id="package">Package.json</h2>
+<div class="text">
+  <p>
+    Just a few last words about <em>package.json</em>.
+  </p>
+  <p>
+    As indicated by its name, the <em>dev</em> script, launched by the <em>npm run dev</em> command, is used for development.<br>
+    It calls <em>rollup</em> with its config file whose default name is <em>rollup.config.js</em> (that's why the <em>-c</em> parameter) in watch mode (that's why the <em>-w</em> parameter) and set the node environment variable <em>BUILD</em> to <em>development</em>.
+  </p>
+  <p>
+    The <em>prod</em> script (<em>npm run prod</em>) calls <em>rollup</em> with the same <em>rollup.config.js</em> file and set the node environment variable <em>BUILD</em> to <em>production</em>.
+  </p>
+</div>
+  <div class="code copy" data-filename="package.json">
+<pre><code class="language-json">{
+  "name": "amstramgram-rollup-plugins",
+  "version": "1.0.0",
+  "description": "CSS, HTML and WATCHER plugins for Rollup.js. A technique to design a website with rollup.js",
+  "author": "Amstramgram <contact@onfaitdessites.fr>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Amstramgram75/Amstramgram-Rollup-Plugins.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Amstramgram75/Amstramgram-Rollup-Plugins/issues"
+  },
+  "homepage": "https://github.com/Amstramgram75/Amstramgram-Rollup-Plugins#readme",
+  "license": "MIT",
+  "scripts": {
+    "dev": "rollup -c -w --environment BUILD:development",
+    "prod": "rollup -c --environment BUILD:production"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.19.0",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-node-resolve": "^14.1.0",
+    "babel-plugin-prismjs": "^2.1.0",
+    "core-js": "^3.25.1",
+    "cssnano": "^5.1.13",
+    "fast-glob": "^3.2.11",
+    "fs-extra": "^10.1.0",
+    "htmlnano": "^2.0.2",
+    "postcss": "^8.4.16",
+    "postcss-import": "^15.0.0",
+    "postcss-preset-env": "^7.8.0",
+    "posthtml": "^0.16.6",
+    "posthtml-include": "^1.7.4",
+    "prismjs": "^1.29.0",
+    "rollup": "^2.79.1",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-livereload": "^2.0.5",
+    "rollup-plugin-serve": "^2.0.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "terser": "^5.15.0"
+  },
+  "browserslist": [
+    "defaults",
+    "ie 11",
+    "Safari >= 9"
+  ]
+}</code></pre>
+  </div>
