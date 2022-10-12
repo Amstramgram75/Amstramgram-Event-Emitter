@@ -9,7 +9,6 @@ import Prism from 'prismjs'
 
 //Redirect to error.html if the browser does not understand our code...
 window.addEventListener('error', e => {
-  console.log(e)
   const nameModule = window.location.origin + '/js/index.js',
     nameNoModule = window.location.origin + '/js/noModule/index.js'
   if (e.filename == nameModule || e.filename == nameNoModule) window.location.href = './error.html'
