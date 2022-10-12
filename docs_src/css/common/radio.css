@@ -1,0 +1,51 @@
+[type="radio"]:checked,
+[type="radio"]:not(:checked) {
+  position: absolute;
+  left: -9999px;
+}
+
+[type="radio"]:checked + label,
+[type="radio"]:not(:checked) + label {
+  position: relative;
+  padding-left: 20px;
+  cursor: pointer;
+  display: inline-block;
+  line-height: var(--radio-height);
+}
+
+[type="radio"]:checked + label:before,
+[type="radio"]:not(:checked) + label:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--radio-height);
+  height: var(--radio-height);
+  border: 1px solid var(--orange);
+  border-radius: 50%;
+  background: #b8b8b8;
+}
+
+[type="radio"]:checked + label:after,
+[type="radio"]:not(:checked) + label:after {
+  content: '';
+  width: calc(0.5 * var(--radio-height));
+  height: calc(0.5 * var(--radio-height));
+  background: var(--red);
+  position: absolute;
+  top: calc(0.25 * var(--radio-height));
+  left: calc(0.25 * var(--radio-height));
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+[type="radio"]:not(:checked) + label:after {
+  opacity: 0;
+  transform: scale(0);
+}
+
+[type="radio"]:checked + label:after {
+  opacity: 1;
+  transform: scale(1);
+}

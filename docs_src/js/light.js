@@ -1,11 +1,11 @@
 import main from './common/main'
 import aside from './common/aside'
 import code from './common/code'
-import BrickWallGame from './common/brickWallGame'
+import BrickWallGame from './common/brickWallGameLight'
 import Dot from './common/dot'
+import EventEmitter from '../../src/amstramgramEventEmitterLight'
+// import EventEmitter from 'Amstramgram-Event-Emitter/Light'
 import Prism from 'prismjs'
-import EventEmitter from '../../src/amstramgramEventEmitter'
-// import EventEmitter from 'Amstramgram-Event-Emitter'
 
 //Redirect to error.html if the browser does not understand our code...
 window.addEventListener('error', e => {
@@ -43,28 +43,29 @@ w.addEventListener("load", function () {
 
 function init() {
   //Basic demo
-  //Instanciation with two empty strings so events 'eventadded' and 'eventremoved' are not dispatched
-  const emitter = new EventEmitter('', '')
+  //Instanciation
+  const emitter = new EventEmitter()
 
   //Same sillyCallback for two events
   emitter.on('firstevent secondevent', sillyCallback)
 
-  //stupidCallback will be called once only
-  emitter.once('thirdevent', stupidCallback)
+  //stupidCallback
+  emitter.on('firstevent', stupidCallback)
 
   function sillyCallback(e) {
-    console.log(e.text)
+    console.log(e.text, e.plus ? "" : "And I'm called by a sillyCallback...")
     if (e.plus) console.log(e.plus)
   }
 
-  function stupidCallback(e1, e2) {
-    console.log(e1, e2)
+  function stupidCallback(e) {
+    console.log(e.text, "And I'm called by a stupidCallback...")
   }
 
   emitter.emit('firstevent', { text: "Hello, I'm the FirstEvent!!!" })
   emitter.emit('secondevent', { text: "Hello, I'm the SecondEvent!!!", plus: "Have a nice day !" })
-  emitter.emit('thirdevent', "Hello, I'm the ThirdEvent!!!", "You'll never see me again !!!")
-  emitter.emit('thirdevent', "You'll never see me !!!")
+
+  emitter.off('firstevent')
+  emitter.emit('firstevent', { text: "Hello, I'm the FirstEvent but you'll never see me !!!" })
 
 
   //Initialize the variables
@@ -74,10 +75,10 @@ function init() {
 
   //Initialize the game
   game = new BrickWallGame('game', document.querySelector('.game-container'))
-  game.once('initialization-end', _ => console.log("Brickwall is ready !"))
-  //Set listener to eventadded and eventremoved
-  game.on('eventadded', e => console.log('EventAdded : ', e))
-  game.on('eventremoved', e => console.log('EventRemoved : ', e))
+  game.on('initialization-end', _ => {
+    game.off('initialization-end')
+    console.log("Brickwall is ready !")
+  })
 
   //associate callback and eventName
   const callbacks = {
@@ -92,21 +93,15 @@ function init() {
 
   Array.from(d.querySelectorAll('input[type=radio]')).forEach(radio => {
     radio.addEventListener('change', e => {
-      //If the associated event is listened
-      //remove all its listeners
-      if (game.events.has(e.target.name)) {
-        game.off(e.target.name)
-      }
-      //Register the callback if on or once
       if (e.target.value == 'on') {
         game.on(e.target.name, callbacks[e.target.name])
-      } else if (e.target.value == 'once') {
-        game.once(e.target.name, callbacks[e.target.name])
+      } else {
+        game.off(e.target.name)
       }
       //Enabled/Disabled the playingIcon
       //Opacity is 0.5 id disabled, 1 if enabled
       if (e.target.name == 'playing') {
-        playingIcon.classList.toggle('enabled', (e.target.value == 'on' || e.target.value == 'once'))
+        playingIcon.classList.toggle('enabled', e.target.value == 'on')
       }
       //Enabled/Disabled the removeButton
       removeButton.classList.toggle('enabled', checkIfActiveListeners())
@@ -119,9 +114,6 @@ function init() {
       game.off()
       //Update the radio buttons state
       Object.keys(callbacks).forEach(key => updateRadios(key))
-      //Restore the listeners on eventadded and eventremoved
-      game.on('eventadded', e => console.log('EventAdded : ', e))
-      game.on('eventremoved', e => console.log('EventRemoved : ', e))
     }
   })
 

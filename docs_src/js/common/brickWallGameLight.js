@@ -1,5 +1,5 @@
-import EventEmitter from '../../../src/amstramgramEventEmitter'
-// import EventEmitter from 'Amstramgram-Event-Emitter'
+import EventEmitter from '../../../src/amstramgramEventEmitterLight'
+// import EventEmitter from 'Amstramgram-Event-Emitter/Light'
 //https://github.com/end3r/Gamedev-Canvas-workshop/blob/gh-pages/lesson10.html
 const
   d = document,

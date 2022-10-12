@@ -71,7 +71,11 @@ em {
   font-weight: bold;
 }
 
-.bold{
+.italic{
+  font-style: italic;
+}
+
+.bold {
   font-weight: bold;
 }
 
@@ -134,7 +138,6 @@ em {
     color: var(--orange);
   }
 
-
   & p,
   & ul {
     font-size: 0.8rem;
@@ -151,18 +154,177 @@ em {
     }
   }
 
-  & .tree-structure{
-    margin-top: 1em;
-    padding: 1em;
-    background: #1e1e1e;
-    color: #c0cde0;
-    font-size: 0.8rem;
-    & ul {
-      margin-top: 0.5em;
-      margin-left: 1em;
-      margin-bottom: 0.5em;
-      padding-left: 0.5em;
-      border-left: 1px solid gray;
+  & .demo {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    height: 322px;
+    user-select: none;
+    & * {
+      box-sizing: border-box;
+    }
+  }
+
+  & .game-container {
+    position: relative;
+
+    & .dot {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    & .left,
+    & .top,
+    & .right,
+    & .bottom {
+      position: absolute;
+      pointer-events: none;
+      transition: opacity 0.2s linear 1s;
+      opacity: 0;
+    }
+
+    & .left,
+    & .right {
+      top: 10px;
+      width: 0;
+      height: 300px;
+    }
+
+    & .top,
+    & .bottom {
+      left: 10px;
+      width: 460px;
+      height: 0;
+    }
+
+    & .left {
+      left: -1px;
+      box-shadow: -2px 0px 10px 3px var(--orange);
+    }
+
+    & .top {
+      top: -1px;
+      box-shadow: 0px -2px 10px 3px var(--orange);
+    }
+
+    & .right {
+      left: 482px;
+      box-shadow: 2px 0 10px 3px var(--orange);
+    }
+
+    & .bottom {
+      top: 322px;
+      box-shadow: 0 2px 10px 3px var(--red);
+    }
+
+    & .show {
+      opacity: 1;
+      transition: none;
+    }
+
+    & #game {
+      background: #1e1e1e;
+      border: 1px solid var(--orange);
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  }
+  & .controls-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-basis: 520px;
+  }
+
+  & .listeners {
+    flex-basis: 350px;
+    flex-shrink: 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 0.7em;
+    font-weight: bold;
+
+    & > div {
+      border: 1px solid var(--body-color);
+      background-color: #8080803b;
+      border-radius: 5px;
+      padding: 10px 15px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      & h4 {
+        color: var(--orange);
+        font-weight: bold;
+        width: 125px;
+      }
+
+      & img {
+        padding-left: 20px;
+      }
+    }
+
+    &.light >div h4 {
+      width: 195px;
+    }
+  }
+
+  & .controls {
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    font-weight: bold;
+    align-items: center;
+    flex-grow: 1;
+    height: 100%;
+    align-self: center;
+
+    & img {
+      opacity: 0.5;
+      transition: opacity 0.4s;
+      &.enabled {
+        opacity: 1;
+      }
+    }
+
+    & .button {
+      box-sizing: border-box;
+      user-select: none;
+      width: 100%;
+      padding: 10px;
+      font-size: 0.9em;
+      display: flex;
+      border: 2px solid var(--orange);
+      border-radius: 5px;
+      background: var(--orange);
+      background-color: #8080803b;
+      transition: border 0.4s, opacity 0.4s;
+      opacity: 0.5;
+
+      &.enabled {
+        opacity: 1;
+        cursor: pointer;
+
+        &:hover {
+          border-color: var(--red);
+          background-color: #80808020;
+        }
+
+        &.active{
+          color: var(--green);
+        }
+      }
+
+      & span {
+        margin: auto;
+        text-align: center;
+      }
     }
   }
 
@@ -173,18 +335,31 @@ em {
       font-size: 0.85em;
       color: var(--orange);
       margin-top: 1em;
+
       &:not(:first-of-type) {
         margin-top: 2em;
       }
     }
+
     & div {
       margin-top: 0.5em;
       border-left: 1px solid var(--orange);
       padding: 0.2em 0 0.2em 0.5em;
+
       & p:not(:first-of-type) {
         margin-top: 0.5em;
       }
     }
+  }
+}
+
+@keyframes imgrotate {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }
 

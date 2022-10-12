@@ -28,6 +28,7 @@ const
   dev = 'docs_dev/',
   prod = 'docs/',
   dest = process.env.BUILD === 'development' ? dev : prod,
+  theExports = [],
   //Babel basic configuration
   babelModule = {
     babelHelpers: 'bundled',
@@ -35,7 +36,7 @@ const
       // '@babel/plugin-proposal-class-properties',
       // '@babel/plugin-proposal-private-methods',
       ['prismjs', {
-        'languages': ['html', 'javascript', 'js-extras', 'json'],
+        'languages': ['javascript', 'js-extras', 'jsdoc'],
       }]
     ]
   },
@@ -57,107 +58,163 @@ const
 if (process.env.BUILD === 'production') fsExtra.emptyDirSync(prod)
 
 //FIRST ROLLUP TASK :
-//- bundle js in a module
+//- bundle index.js in a module
 //- watch assets and rollupPlugins folders
 //- compile css with minification if in production
 //- compile html with minification if in production
 //- launch server with livereload if in development
 //- copy assets and minify js if in production
-const moduleExport = {
-  input: `${src}js/index.js`,
-  output: {
-    file: `${dest}js/index.js`,
-    format: 'esm',
-    sourcemap: process.env.BUILD === 'development',
-  },
-  plugins: [
-    //noderesolve and commonjs are needed for prism.js
-    noderesolve(),
-    commonjs(),
-    cssPlugin({
-      from: `${src}css/`,
-      to: `${dest}css`,
-      sourceMap: process.env.BUILD === 'development',
-      plugins: [
-        postcssImport(),
-        postcssPresetEnv({
-          stage: 1,
-          importFrom: [
-            `${src}css/common/const.css`//Needed for css custom properties
-          ]
-        }),
-        ...(process.env.BUILD === 'production' ? [cssnano()] : [])
-      ]
-    }),
-    htmlPlugin({
-      from: src,
-      to: dest,
-      plugins: [
-        htmlinclude({
-          root: `${src}html/`
-        }),
-        ...(process.env.BUILD === 'production' ? [htmlnano()] : [])
-      ]
-    }),
-    ...(Object.keys(babelModule).length > 0 ? [babel(babelModule)] : []),
-    ...(process.env.BUILD === 'development' ?
-      [//Server and livereload for development
-        serve({
-          open: true,
-          contentBase: dev,
-          port: 8000
-        }),
-        livereload(),
-        watcher({
-          files: [`${dev}assets`],
-          verbose: true
-        }),
-      ]
-      :
-      [//Copy assets folder
-        copy({
-          targets: [
-            { src: `${dev}assets`, dest: prod }
-          ]
-        }),
-        //and minify
-        terser()
-      ]
-    )
-  ],
-  //Comment/Uncomment if you need
-  watch: {
-    clearScreen: process.env.BUILD === 'production',
-  },
-}
+theExports.push(
+  {
+    input: `${src}js/index.js`,
+    output: {
+      file: `${dest}js/index.js`,
+      format: 'esm',
+      sourcemap: process.env.BUILD === 'development',
+    },
+    plugins: [
+      //noderesolve and commonjs are needed for prism.js
+      noderesolve(),
+      commonjs(),
+      cssPlugin({
+        from: `${src}css/`,
+        to: `${dest}css`,
+        sourceMap: process.env.BUILD === 'development',
+        plugins: [
+          postcssImport(),
+          postcssPresetEnv({
+            stage: 1,
+            importFrom: [
+              `${src}css/common/const.css`//Needed for css custom properties
+            ]
+          }),
+          ...(process.env.BUILD === 'production' ? [cssnano()] : [])
+        ]
+      }),
+      htmlPlugin({
+        from: src,
+        to: dest,
+        plugins: [
+          htmlinclude({
+            root: `${src}html/`
+          }),
+          ...(process.env.BUILD === 'production' ? [htmlnano()] : [])
+        ]
+      }),
+      ...(Object.keys(babelModule).length > 0 ? [babel(babelModule)] : []),
+      ...(process.env.BUILD === 'development' ?
+        [//Server and livereload for development
+          serve({
+            open: true,
+            contentBase: dev,
+            port: 8000
+          }),
+          livereload(),
+          watcher({
+            files: [`${dev}assets`],
+            verbose: true
+          }),
+        ]
+        :
+        [//Copy assets folder
+          copy({
+            targets: [
+              { src: `${dev}assets`, dest: prod }
+            ]
+          }),
+          //and minify
+          terser()
+        ]
+      )
+    ],
+    //Comment/Uncomment if you need
+    watch: {
+      clearScreen: process.env.BUILD === 'production',
+    },
+  }
+)
 
-//SECOND ROLLUP TASK : bundle js in IIFE format
-const noModuleExport = {
-  input: `${src}js/index.js`,
-  output: {
-    file: `${dest}js/noModule/index.js`,
-    format: 'iife'
-  },
-  plugins: [
-    //noderesolve and commonjs are needed for prism.js
-    noderesolve(),
-    commonjs(),
-    babel(babelNoModule),
-    ...(process.env.BUILD === 'production' ? [terser()] : [])
-  ]
-}
+//SECOND ROLLUP TASK : bundle light.js in esm format
+theExports.push(
+  {
+    input: `${src}js/light.js`,
+    output: {
+      file: `${dest}js/light.js`,
+      format: 'esm',
+      sourcemap: process.env.BUILD === 'development',
+    },
+    plugins: [
+      //noderesolve and commonjs are needed for prism.js
+      noderesolve(),
+      commonjs(),
+      ...(Object.keys(babelModule).length > 0 ? [babel(babelModule)] : []),
+      ...(process.env.BUILD === 'development' ?
+        [//Server and livereload for development
+          serve({
+            open: true,
+            contentBase: dev,
+            port: 8000
+          }),
+          livereload(),
+        ]
+        :
+        [//minify
+          terser()
+        ]
+      )
+    ]
+  }
+)
 
-//THIRD ROLLUP TASK : bundle polyfills
-const polyfillExport = {
-  input: `${src}js/polyfills/polyfill.js`,
-  output: {
-    file: `${dest}js/polyfills/polyfill.js`,
-    format: 'iife'
-  },
-  plugins: [
-    ...(process.env.BUILD === 'production' ? [terser()] : [])
-  ]
-}
+//THIRD ROLLUP TASK : bundle index.js in IIFE format
+theExports.push(
+  {
+    input: `${src}js/index.js`,
+    output: {
+      file: `${dest}js/noModule/index.js`,
+      format: 'iife'
+    },
+    plugins: [
+      //noderesolve and commonjs are needed for prism.js
+      noderesolve(),
+      commonjs(),
+      babel(babelNoModule),
+      ...(process.env.BUILD === 'production' ? [terser()] : [])
+    ]
+  }
+)
+
+//FOURTH ROLLUP TASK : bundle light.js in IIFE format
+theExports.push(
+  {
+    input: `${src}js/light.js`,
+    output: {
+      file: `${dest}js/noModule/light.js`,
+      format: 'iife'
+    },
+    plugins: [
+      //noderesolve and commonjs are needed for prism.js
+      noderesolve(),
+      commonjs(),
+      babel(babelNoModule),
+      ...(process.env.BUILD === 'production' ? [terser()] : [])
+    ]
+  }
+)
+
+//FIFTH ROLLUP TASK : bundle polyfills in IIFE format
+theExports.push(
+  {
+    input: `${src}js/polyfills/polyfill.js`,
+    output: {
+      file: `${dest}js/polyfills/polyfill.js`,
+      format: 'iife'
+    },
+    plugins: [
+      ...(process.env.BUILD === 'production' ? [terser()] : [])
+    ]
+  }
+)
 
 //Export rollup tasks
-export default [moduleExport, noModuleExport, polyfillExport]
+export default theExports

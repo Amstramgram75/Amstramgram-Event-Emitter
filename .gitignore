@@ -2,6 +2,7 @@ amstramgramEventEmitter.code-workspace
 .vscode
 docs_dev
 node_modules
+work
 *.tgz
 package-lock.json
 todo.txt
