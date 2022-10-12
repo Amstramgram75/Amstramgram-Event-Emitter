@@ -2,4 +2,4 @@
 
 Inspiration is taken from [https://gist.github.com/mudge/5830382#gistcomment-2691957](https://gist.github.com/mudge/5830382#gistcomment-2691957)
 
-[__DEMO & DEMO__](https://amstramgram75.github.io/Amstramgram-Event-Emitter/)
+[__DEMO & DOCS__](https://amstramgram75.github.io/Amstramgram-Event-Emitter/)
