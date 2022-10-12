@@ -1,16 +1,16 @@
 {
   "name": "amstramgram-event-emitter",
   "version": "1.0.0",
-  "description": "A very simple EventEmitter in pure JavaScript with ES6 class implementation",
+  "description": "A very simple Event Emitter in pure JavaScript with ES6 class implementation",
   "author": "Amstramgram <contact@onfaitdessites.fr>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Amstramgram75/Amstramgram-Rollup-Plugins.git"
+    "url": "git+https://github.com/Amstramgram75/Amstramgram-Event-Emitter.git"
   },
   "bugs": {
-    "url": "https://github.com/Amstramgram75/Amstramgram-Rollup-Plugins/issues"
+    "url": "https://github.com/Amstramgram75/Amstramgram-Event-Emitter/issues"
   },
-  "homepage": "https://github.com/Amstramgram75/Amstramgram-Rollup-Plugins#readme",
+  "homepage": "https://github.com/Amstramgram75/Amstramgram-Event-Emitter#readme",
   "license": "MIT",
   "module": "amstramgramEventEmitter.js",
   "exports": {
