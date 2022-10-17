@@ -3,7 +3,23 @@
 <head>	
 	<title>Amstramgram Event Emitter Light - Demo & Docs</title>
 	<include src="common/head.html"></include>
-</head>
+	<script>
+		var d = document, s = d.createElement('script');
+		s.async = "false";
+		s.defer = "true";
+		try {
+			//Throw error if class private fields are not supported
+			eval("class test{#private;constructor(){}}");
+			console.log("Class private fields are supported")
+			s.type = "module";
+			s.src = "js/light.js";
+		} catch(e) {
+			console.log("Class private fields are not supported")
+			s.src = "js/noModule/light.js";
+		}
+		d.head.appendChild(s);
+	</script>	
+	</head>
 <body>
 	<include src="common/header-aside.html"></include>
   <div class="content-wrapper">
@@ -13,7 +29,5 @@
 	</div>
 	<div class="up"></div>
   <link rel="stylesheet" href="css/main.css" media="print" onload="this.media='all';">
-  <script type="module" src="js/light.js"></script> -->
-  <script nomodule src="js/noModule/light.js"></script>
 </body>
 </html>
