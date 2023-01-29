@@ -263,6 +263,7 @@ export default class AmstramgramEventEmitter {
             if (id == 0) {//Once
               this.#unregisterCallback(eventName, callback, true, this.#eventsOnce)
             }
+            args.push(eventName)
             callback.apply(this, args)
           }.bind(this))
         }

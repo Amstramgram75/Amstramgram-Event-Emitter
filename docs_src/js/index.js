@@ -51,8 +51,8 @@ function init() {
   //stupidCallback will be called once only
   emitter.once('thirdevent', stupidCallback)
 
-  function sillyCallback(e) {
-    console.log(e.text)
+  function sillyCallback(e, eventName) {
+    console.log(e.text + ' And my original name is : ' + eventName)
     if (e.plus) console.log(e.plus)
   }
 

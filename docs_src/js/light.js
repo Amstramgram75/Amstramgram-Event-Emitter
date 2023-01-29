@@ -51,13 +51,13 @@ function init() {
   //stupidCallback
   emitter.on('firstevent', stupidCallback)
 
-  function sillyCallback(e) {
-    console.log(e.text, e.plus ? "" : "And I'm called by a sillyCallback...")
+  function sillyCallback(e, eventName) {
+    console.log(e.text, "My nickname is " + eventName, e.plus ? "." : "and I'm called by a sillyCallback...")
     if (e.plus) console.log(e.plus)
   }
 
-  function stupidCallback(e) {
-    console.log(e.text, "And I'm called by a stupidCallback...")
+  function stupidCallback(e, eventName) {
+    console.log(e.text, "My nickname is " + eventName, "and I'm called by a stupidCallback...")
   }
 
   emitter.emit('firstevent', { text: "Hello, I'm the FirstEvent!!!" })

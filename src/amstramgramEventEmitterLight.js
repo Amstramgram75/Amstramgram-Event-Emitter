@@ -154,6 +154,7 @@ export default class AmstramgramEventEmitterLight {
   emit(eventName, ...args) {
     if (typeof this.#events[eventName] !== "undefined") {
       this.#events[eventName].forEach(function (callback) {
+        args.push(eventName)
         callback.apply(this, args)
       }.bind(this))
     }
