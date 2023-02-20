@@ -112,13 +112,13 @@ emitter.on('firstevent secondevent', sillyCallback)
 //stupidCallback will be called once only
 emitter.once('thirdevent', stupidCallback)
   
-function sillyCallback(e, eventName) {
-  console.log(e.text + ' And my original name is : ' + eventName)
+function sillyCallback(e) {
+  console.log(e.text + ' And my original name is : ' + e.eventName)
   if (e.plus) console.log(e.plus)
 }
 
-function stupidCallback(e1, e2) {
-  console.log(e1, e2)
+function stupidCallback(e1, e2, eventName) {
+  console.log(e1 + eventName + ' !!!', e2)
 }
 
 emitter.emit('firstevent', { text: "Hello, I'm the FirstEvent!!!" })
@@ -131,7 +131,9 @@ emitter.emit('thirdevent', "You'll never see me !!!")
     Open your console to see the result...
 </p>
 <p class="text bold">
-    Note that the event name is always passed as last argument to the callback.
+    Note that :<br>
+    &nbsp;&nbsp;- if there is only one argument and that argument is an object, an eventName property with the name of the event is automatically added to it.<br>
+    &nbsp;&nbsp;- in all other cases, the event name is passed as last argument to the callback.
 </p>
 <h3>Normal</h3> 
 <p class="text">
@@ -237,6 +239,9 @@ emitter.off()
  * @description : emit a given event.
  * @param {String} eventName : event to emit.
  * @param  {...any} args parameters passed to the callbacks.
+ *    If args is an object, the property eventName 
+ *      with the name of the emitted event is automatically added to it.
+ *    In all other cases, the event name is passed as last argument to the callback.
  * @returns this so methods can be chained.
 **/
 emit(eventName, args)

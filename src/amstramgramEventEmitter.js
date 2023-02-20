@@ -70,7 +70,7 @@ export default class AmstramgramEventEmitter {
         added = true
         //Get a reference to the events object in accordance with the once parameter
         const eventsCollection = once ? this.#eventsOnce : this.#events,
-        set = eventsCollection[eventName] || (eventsCollection[eventName] = new Set())
+          set = eventsCollection[eventName] || (eventsCollection[eventName] = new Set())
         set.add(callback)
         this.#updateEventsAndCallbacksList()
       }
@@ -139,7 +139,7 @@ export default class AmstramgramEventEmitter {
         //We can't use this.#events[eventName].has(callback) simply because
         //this.#events[eventName] can be undefined
         eventsCollection = (this.#eventsAndCallbacks[eventName].callbacks.has(callback)) ? this.#events : this.#eventsOnce
-      } 
+      }
       if (internal || typeof eventsCollection[eventName] !== "undefined") {
         removed = eventsCollection[eventName].delete(callback)
         if (eventsCollection[eventName].size == 0) delete eventsCollection[eventName]
@@ -234,7 +234,7 @@ export default class AmstramgramEventEmitter {
   off(eventsNames = '', callback = undefined) {
     if (typeof eventsNames === 'string') {
       if (eventsNames == '') {
-          this.#unregisterAll()
+        this.#unregisterAll()
       } else {
         eventsNames.split(' ').forEach(eventName => {
           if (callback == undefined) {
@@ -256,14 +256,26 @@ export default class AmstramgramEventEmitter {
    * @returns this so methods can be chained
    */
   emit(eventName, ...args) {
-    if(this.#eventsNames.has(eventName)) {
+    if (this.#eventsNames.has(eventName)) {
+      //https://underscorejs.org/docs/modules/isObject.html
+      function isObject(obj) {
+        const type = typeof obj
+        return type === 'function' || (type === 'object' && !!obj)
+      }
       [this.#eventsOnce[eventName], this.#events[eventName]].forEach((set, id) => {
         if (typeof set !== "undefined") {
           set.forEach(function (callback) {
             if (id == 0) {//Once
               this.#unregisterCallback(eventName, callback, true, this.#eventsOnce)
             }
-            args.push(eventName)
+            //If there is only one argument and if it's an object
+            if (args.length == 1 && isObject(args[0])) {
+              //Add a eventName property holding the event name
+              args[0].eventName = eventName
+            } else {
+              //Add the event name to the list of argument
+              args.push(eventName)
+            }
             callback.apply(this, args)
           }.bind(this))
         }

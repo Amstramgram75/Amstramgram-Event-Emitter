@@ -51,18 +51,18 @@ function init() {
   //stupidCallback will be called once only
   emitter.once('thirdevent', stupidCallback)
 
-  function sillyCallback(e, eventName) {
-    console.log(e.text + ' And my original name is : ' + eventName)
+  function sillyCallback(e) {
+    console.log(e.text + ' And my original name is : ' + e.eventName)
     if (e.plus) console.log(e.plus)
   }
 
-  function stupidCallback(e1, e2) {
-    console.log(e1, e2)
+  function stupidCallback(e1, e2, eventName) {
+    console.log(e1 + eventName + ' !!!', e2)
   }
 
-  emitter.emit('firstevent', { text: "Hello, I'm the FirstEvent!!!" })
-  emitter.emit('secondevent', { text: "Hello, I'm the SecondEvent!!!", plus: "Have a nice day !" })
-  emitter.emit('thirdevent', "Hello, I'm the ThirdEvent!!!", "You'll never see me again !!!")
+  emitter.emit('firstevent', { text: "Hello, I'm the FirstEvent !!!" })
+  emitter.emit('secondevent', { text: "Hello, I'm the SecondEvent !!!", plus: "Have a nice day !" })
+  emitter.emit('thirdevent', "Hello, my nicknname is ", "You'll never see me again !!!")
   emitter.emit('thirdevent', "You'll never see me !!!")
 
 

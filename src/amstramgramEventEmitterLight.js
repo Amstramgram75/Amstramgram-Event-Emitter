@@ -57,7 +57,7 @@ export default class AmstramgramEventEmitterLight {
       this.#events[eventName].forEach(callback => {
         this.#unregisterCallback(eventName, callback, true)
       })
-    } 
+    }
   }
 
   /**
@@ -78,7 +78,7 @@ export default class AmstramgramEventEmitterLight {
   /***********************************
    *           CONSTRUCTOR           *
    ***********************************/
-  constructor() {}
+  constructor() { }
 
 
   /***********************************
@@ -153,8 +153,20 @@ export default class AmstramgramEventEmitterLight {
    */
   emit(eventName, ...args) {
     if (typeof this.#events[eventName] !== "undefined") {
+      //https://underscorejs.org/docs/modules/isObject.html
+      function isObject(obj) {
+        const type = typeof obj
+        return type === 'function' || (type === 'object' && !!obj)
+      }
       this.#events[eventName].forEach(function (callback) {
-        args.push(eventName)
+        //If there is only one argument and if it's an object
+        if (args.length == 1 && isObject(args[0])) {
+          //Add a eventName property holding the event name
+          args[0].eventName = eventName
+        } else {
+          //Add the event name to the list of argument
+          args.push(eventName)
+        }
         callback.apply(this, args)
       }.bind(this))
     }
